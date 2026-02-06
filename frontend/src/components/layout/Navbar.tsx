@@ -29,7 +29,7 @@ export default function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <Shield className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold text-foreground">RefHub</span>
+          <span className="text-xl font-bold text-foreground">RefNexus</span>
         </Link>
 
         {/* Desktop Navigation */}

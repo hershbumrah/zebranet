@@ -50,7 +50,7 @@ export default function RegisterPage() {
       await register(email, password, role, extraData);
       toast({
         title: 'Account created!',
-        description: 'Welcome to RefHub.',
+        description: 'Welcome to RefNexus.',
       });
       navigate('/');
     } catch (error) {
@@ -70,7 +70,7 @@ export default function RegisterPage() {
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-2">
             <Shield className="h-10 w-10 text-primary" />
-            <span className="text-2xl font-bold text-foreground">RefHub</span>
+            <span className="text-2xl font-bold text-foreground">RefNexus</span>
           </Link>
         </div>
 

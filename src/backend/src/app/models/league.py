@@ -19,5 +19,6 @@ class League(Base):
 
     user = relationship("User", back_populates="league_profile")
     games: Mapped[List["Game"]] = relationship(back_populates="league")
+    field_locations: Mapped[List["FieldLocation"]] = relationship(back_populates="league")
     ratings: Mapped[List["Rating"]] = relationship(back_populates="league")
     notes: Mapped[List["RefNote"]] = relationship(back_populates="league")

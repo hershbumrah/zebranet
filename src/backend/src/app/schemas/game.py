@@ -7,11 +7,10 @@ from pydantic import BaseModel
 
 
 class GameBase(BaseModel):
-    location: str
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    field_location_id: int
     scheduled_start: datetime
     age_group: Optional[str] = None
+    gender_focus: Optional[str] = None
     competition_level: Optional[str] = None
     status: Optional[str] = None
     center_fee: Optional[float] = None
@@ -23,11 +22,10 @@ class GameCreate(GameBase):
 
 
 class GameUpdate(BaseModel):
-    location: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    field_location_id: Optional[int] = None
     scheduled_start: Optional[datetime] = None
     age_group: Optional[str] = None
+    gender_focus: Optional[str] = None
     competition_level: Optional[str] = None
     status: Optional[str] = None
     center_fee: Optional[float] = None

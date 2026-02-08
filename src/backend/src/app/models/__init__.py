@@ -2,6 +2,7 @@
 
 from app.models.assignment import Assignment
 from app.models.availability import AvailabilitySlot
+from app.models.field_location import FieldLocation
 from app.models.game import Game
 from app.models.league import League
 from app.models.note import RefNote
@@ -13,6 +14,7 @@ __all__ = [
     "User",
     "RefereeProfile",
     "League",
+    "FieldLocation",
     "Game",
     "Assignment",
     "Rating",

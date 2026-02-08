@@ -2,7 +2,7 @@
 
 from app.db.base import Base
 from app.db.session import engine
-from app.models import assignment, availability, game, league, note, rating, referee, user
+from app.models import assignment, availability, field_location, game, league, note, rating, referee, user
 
 
 def init_db() -> None:

@@ -41,7 +41,7 @@ def get_current_referee(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db_dep),
 ) -> RefereeProfile:
-    if current_user.role != "referee":
+    if current_user.role not in {"ref", "referee"}:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Referee role required")
     profile = db.query(RefereeProfile).filter(RefereeProfile.user_id == current_user.id).first()
     if not profile:

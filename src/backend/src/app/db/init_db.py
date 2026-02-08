@@ -7,3 +7,7 @@ from app.models import assignment, availability, field_location, game, league, n
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
+
+
+if __name__ == "__main__":
+    init_db()

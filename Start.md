@@ -11,12 +11,12 @@ This guide shows how to run the backend and frontend locally.
 1. Copy the example environment file and set values:
    - Copy backend/.env.example to backend/.env
    - Update DATABASE_URL, JWT_SECRET_KEY, and OPENAI_API_KEY
-2. Install dependencies (from backend/):
+2. Install dependencies (from src/backend/):
    - uv sync
-3. Initialize the database (from backend/):
-   - uv run python -m app.db.init_db
-4. Start the API server (from backend/):
-   - uv run uvicorn app.main:app --reload
+3. Initialize the database (from src/backend/):
+   - PYTHONPATH=src uv run python -m app.db.init_db
+4. Start the API server (from src/backend/):
+   - PYTHONPATH=src uv run uvicorn app.main:app --reload
 
 API will be available at http://localhost:8000
 

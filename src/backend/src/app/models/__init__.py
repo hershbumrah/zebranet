@@ -5,6 +5,7 @@ from app.models.availability import AvailabilitySlot
 from app.models.field_location import FieldLocation
 from app.models.game import Game
 from app.models.league import League
+from app.models.message import Message
 from app.models.note import RefNote
 from app.models.rating import Rating
 from app.models.referee import RefereeProfile
@@ -20,4 +21,5 @@ __all__ = [
     "Rating",
     "RefNote",
     "AvailabilitySlot",
+    "Message",
 ]

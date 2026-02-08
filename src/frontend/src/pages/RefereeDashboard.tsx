@@ -9,6 +9,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import RefProfileForm from '@/components/referee/RefProfileForm';
 import RefAvailability from '@/components/referee/RefAvailability';
 import RefAssignments from '@/components/referee/RefAssignments';
+import ChatBox from '@/components/ChatBox';
 import { useToast } from '@/hooks/use-toast';
 
 export default function RefereeDashboard() {
@@ -282,6 +283,11 @@ export default function RefereeDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* AI Assistant */}
+        <div className="mt-6">
+          <ChatBox />
+        </div>
       </div>
     </MainLayout>
   );

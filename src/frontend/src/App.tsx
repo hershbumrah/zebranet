@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import RefereeDashboard from "./pages/RefereeDashboard";
 import LeagueDashboard from "./pages/LeagueDashboard";
+import InboxPage from "./pages/InboxPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['league']}>
                   <LeagueDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inbox"
+              element={
+                <ProtectedRoute allowedRoles={['ref', 'league']}>
+                  <InboxPage />
                 </ProtectedRoute>
               }
             />

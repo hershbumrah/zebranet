@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import routes_ai, routes_auth, routes_games, routes_leagues, routes_refs
+from app.api import routes_ai, routes_auth, routes_games, routes_leagues, routes_refs, routes_messages
 
 
 def create_app() -> FastAPI:
@@ -22,6 +22,7 @@ def create_app() -> FastAPI:
     app.include_router(routes_leagues.router, prefix="/leagues", tags=["leagues"])
     app.include_router(routes_games.router, prefix="/games", tags=["games"])
     app.include_router(routes_ai.router, prefix="/ai", tags=["ai"])
+    app.include_router(routes_messages.router, prefix="/messages", tags=["messages"])
 
     return app
 

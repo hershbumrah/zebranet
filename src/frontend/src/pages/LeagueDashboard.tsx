@@ -10,6 +10,7 @@ import CreateGameForm from '@/components/league/CreateGameForm';
 import GamesList from '@/components/league/GamesList';
 import RefSearch from '@/components/league/RefSearch';
 import AIAssignor from '@/components/league/AIAssignor';
+import ChatBox from '@/components/ChatBox';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LeagueDashboard() {
@@ -248,6 +249,12 @@ export default function LeagueDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* AI Assistant */}
+        <div className="mt-6">
+          <ChatBox />
+        </div>
+
       </div>
     </MainLayout>
   );

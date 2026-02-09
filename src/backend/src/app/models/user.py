@@ -26,3 +26,9 @@ class User(Base):
     league_profile: Mapped[Optional["League"]] = relationship(
         back_populates="user", uselist=False
     )
+    sent_messages: Mapped[List["Message"]] = relationship(
+        "Message", foreign_keys="[Message.sender_id]", back_populates="sender"
+    )
+    received_messages: Mapped[List["Message"]] = relationship(
+        "Message", foreign_keys="[Message.recipient_id]", back_populates="recipient"
+    )

@@ -29,3 +29,4 @@ class Game(Base):
     assignments: Mapped[List["Assignment"]] = relationship(back_populates="game")
     ratings: Mapped[List["Rating"]] = relationship(back_populates="game")
     notes: Mapped[List["RefNote"]] = relationship(back_populates="game")
+    messages: Mapped[List["Message"]] = relationship(back_populates="game")

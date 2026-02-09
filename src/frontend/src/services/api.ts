@@ -15,6 +15,12 @@ import {
   FindRefRequest,
   FindRefResult,
   RefSearchParams,
+  RefereeLookup,
+  Message,
+  MessageCreate,
+  ConversationParticipant,
+  AIChatRequest,
+  AIChatResponse,
 } from '@/types';
 
 // Configure your FastAPI backend URL here
@@ -109,6 +115,11 @@ class ApiClient {
         }
       });
       return this.request<RefereeWithStats[]>(`/refs/search?${queryParams}`, {}, token);
+    },
+
+    lookup: async (token: string, query: string, limit: number = 10): Promise<RefereeLookup[]> => {
+      const queryParams = new URLSearchParams({ query, limit: String(limit) });
+      return this.request<RefereeLookup[]>(`/refs/lookup?${queryParams}`, {}, token);
     },
 
     getAvailability: async (token: string): Promise<AvailabilitySlot[]> => {
@@ -249,6 +260,59 @@ class ApiClient {
       }, token);
     },
   };
+
+  // Message endpoints
+  messages = {
+    // AI Chat endpoint
+    aiChat: async (token: string, request: AIChatRequest): Promise<AIChatResponse> => {
+      return this.request<AIChatResponse>('/messages/ai-chat', {
+        method: 'POST',
+        body: JSON.stringify(request),
+      }, token);
+    },
+    
+    send: async (token: string, message: MessageCreate): Promise<Message> => {
+      return this.request<Message>('/messages/', {
+        method: 'POST',
+        body: JSON.stringify(message),
+      }, token);
+    },
+    
+    getConversations: async (token: string): Promise<ConversationParticipant[]> => {
+      return this.request<ConversationParticipant[]>('/messages/conversations', {}, token);
+    },
+    
+    getConversation: async (
+      token: string, 
+      otherUserId: number, 
+      skip: number = 0, 
+      limit: number = 50
+    ): Promise<Message[]> => {
+      return this.request<Message[]>(
+        `/messages/conversation/${otherUserId}?skip=${skip}&limit=${limit}`, 
+        {}, 
+        token
+      );
+    },
+    
+    markAsRead: async (token: string, messageId: number): Promise<Message> => {
+      return this.request<Message>(`/messages/${messageId}/read`, {
+        method: 'PATCH',
+      }, token);
+    },
+    
+    markConversationRead: async (token: string, otherUserId: number): Promise<{ marked_read: number }> => {
+      return this.request<{ marked_read: number }>(
+        `/messages/conversation/${otherUserId}/mark-read`, 
+        { method: 'POST' }, 
+        token
+      );
+    },
+    
+    getUnreadCount: async (token: string): Promise<{ unread_count: number }> => {
+      return this.request<{ unread_count: number }>('/messages/unread-count', {}, token);
+    },
+  };
 }
 
 const apiClient = new ApiClient(API_BASE_URL);
@@ -262,4 +326,5 @@ export const ratingsApi = apiClient.ratings;
 export const notesApi = apiClient.notes;
 export const aiApi = apiClient.ai;
 
+export const messagesApi = apiClient.messages;
 export default apiClient;

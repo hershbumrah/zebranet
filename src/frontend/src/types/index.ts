@@ -139,3 +139,66 @@ export interface RefSearchParams {
   available_start?: string;
   available_end?: string;
 }
+
+export interface RefereeLookup {
+  user_id: number;
+  referee_id: number;
+  full_name?: string;
+  email: string;
+  cert_level?: string;
+  home_location?: string;
+}
+
+// Message Types
+export interface Message {
+  id: number;
+  sender_id: number;
+  recipient_id: number;
+  content: string;
+  game_id?: number;
+  is_read: boolean;
+  created_at: string;
+  read_at?: string;
+  sender_email?: string;
+  sender_name?: string;
+  recipient_email?: string;
+  recipient_name?: string;
+}
+
+export interface ConversationParticipant {
+  user_id: number;
+  email: string;
+  name?: string;
+  role: 'ref' | 'league';
+  last_message?: string;
+  last_message_at?: string;
+  unread_count: number;
+}
+
+export interface MessageCreate {
+  recipient_id: number;
+  content: string;
+  game_id?: number;
+}
+
+// AI Chat Types
+export interface AIChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface AIChatRequest {
+  message: string;
+  conversation_history?: Array<{ role: string; content: string }>;
+}
+
+export interface AIChatResponse {
+  response: string;
+  actions: Array<{
+    function: string;
+    arguments: Record<string, any>;
+    result: any;
+  }>;
+  function_calls: boolean;
+}
+

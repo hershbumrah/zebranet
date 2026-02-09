@@ -17,11 +17,16 @@ from app.schemas.note import NoteCreate, NoteResponse
 from app.schemas.rating import RatingCreate, RatingResponse
 from app.schemas.referee import (
     AvailabilityCreate,
+    RefereeLookupResponse,
     RefereeProfilePublic,
     RefereeProfileUpdate,
     RefereeStatsResponse,
 )
-from app.services.referee_service import get_referee_stats, search_candidate_refs
+from app.services.referee_service import (
+    get_referee_stats,
+    search_candidate_refs,
+    search_refs_by_name_or_email,
+)
 from app.services.rating_service import create_note, create_rating
 
 router = APIRouter()
@@ -44,6 +49,41 @@ def update_me(
     db.refresh(current_ref)
     return RefereeProfilePublic.model_validate(current_ref)
 
+@router.get("/lookup", response_model=List[RefereeLookupResponse])
+def lookup_refs(
+    query: str = Query(..., min_length=2),
+    limit: int = Query(10, ge=1, le=50),
+    db: Session = Depends(get_db_dep),
+    current_league=Depends(get_current_league),
+) -> List[RefereeLookupResponse]:
+    results = search_refs_by_name_or_email(db, query, limit)
+    return [
+        RefereeLookupResponse(
+            user_id=user.id,
+            referee_id=ref.id,
+            full_name=ref.full_name,
+            email=user.email,
+            cert_level=ref.cert_level,
+            home_location=ref.home_location,
+        )
+        for ref, user in results
+    ]
+
+@router.get("/search", response_model=List[RefereeProfilePublic])
+def search_refs(
+    min_rating: Optional[float] = Query(None),
+    max_distance_km: Optional[float] = Query(None),
+    lat: Optional[float] = Query(None),
+    lon: Optional[float] = Query(None),
+    db: Session = Depends(get_db_dep),
+) -> List[RefereeProfilePublic]:
+    constraints = {
+        "min_rating": min_rating,
+        "max_distance_km": max_distance_km,
+        "location": {"lat": lat, "lon": lon},
+    }
+    refs = search_candidate_refs(db, constraints)
+    return [RefereeProfilePublic.model_validate(r) for r in refs]
 
 @router.get("/{ref_id}", response_model=RefereeProfilePublic)
 def get_ref(ref_id: int, db: Session = Depends(get_db_dep)) -> RefereeProfilePublic:
@@ -116,6 +156,27 @@ def search_refs(
     }
     refs = search_candidate_refs(db, constraints)
     return [RefereeProfilePublic.model_validate(r) for r in refs]
+
+
+@router.get("/lookup", response_model=List[RefereeLookupResponse])
+def lookup_refs(
+    query: str = Query(..., min_length=2),
+    limit: int = Query(10, ge=1, le=50),
+    db: Session = Depends(get_db_dep),
+    current_league=Depends(get_current_league),
+) -> List[RefereeLookupResponse]:
+    results = search_refs_by_name_or_email(db, query, limit)
+    return [
+        RefereeLookupResponse(
+            user_id=user.id,
+            referee_id=ref.id,
+            full_name=ref.full_name,
+            email=user.email,
+            cert_level=ref.cert_level,
+            home_location=ref.home_location,
+        )
+        for ref, user in results
+    ]
 
 
 @router.post("/me/availability")

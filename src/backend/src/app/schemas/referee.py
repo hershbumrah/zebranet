@@ -33,6 +33,15 @@ class RefereeProfilePublic(RefereeProfileBase):
         from_attributes = True
 
 
+class RefereeLookupResponse(BaseModel):
+    user_id: int
+    referee_id: int
+    full_name: Optional[str] = None
+    email: str
+    cert_level: Optional[str] = None
+    home_location: Optional[str] = None
+
+
 class NoteSummary(BaseModel):
     id: int
     note_text: str

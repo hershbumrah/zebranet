@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Shield, Menu, User, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
@@ -10,12 +11,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const socketRef = useRef<WebSocket | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -23,6 +26,45 @@ export default function Navbar() {
   };
 
   const dashboardLink = user?.role === 'ref' ? '/referee' : '/league';
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUnreadCount(0);
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const wsUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://` +
+      `${window.location.hostname}:8000/messages/ws/inbox?token=${encodeURIComponent(token)}`;
+
+    const ws = new WebSocket(wsUrl);
+    socketRef.current = ws;
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'unread' && typeof data.unread_count === 'number') {
+          setUnreadCount(data.unread_count);
+        }
+      } catch {
+        // ignore malformed
+      }
+    };
+
+    ws.onclose = () => {
+      socketRef.current = null;
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [isAuthenticated]);
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -41,6 +83,19 @@ export default function Navbar() {
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 Dashboard
+              </Link>
+              <Link
+                to="/inbox"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <span className="inline-flex items-center gap-2">
+                  Inbox
+                  {unreadCount > 0 && (
+                    <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </Badge>
+                  )}
+                </span>
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -99,6 +154,20 @@ export default function Navbar() {
                     className="px-2 py-2 text-foreground hover:bg-accent rounded-md"
                   >
                     Dashboard
+                  </Link>
+                  <Link
+                    to="/inbox"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-2 py-2 text-foreground hover:bg-accent rounded-md"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      Inbox
+                      {unreadCount > 0 && (
+                        <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </Badge>
+                      )}
+                    </span>
                   </Link>
                   <button
                     onClick={() => {

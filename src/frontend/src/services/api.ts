@@ -15,6 +15,7 @@ import {
   FindRefRequest,
   FindRefResult,
   RefSearchParams,
+  RefereeLookup,
   Message,
   MessageCreate,
   ConversationParticipant,
@@ -114,6 +115,11 @@ class ApiClient {
         }
       });
       return this.request<RefereeWithStats[]>(`/refs/search?${queryParams}`, {}, token);
+    },
+
+    lookup: async (token: string, query: string, limit: number = 10): Promise<RefereeLookup[]> => {
+      const queryParams = new URLSearchParams({ query, limit: String(limit) });
+      return this.request<RefereeLookup[]>(`/refs/lookup?${queryParams}`, {}, token);
     },
 
     getAvailability: async (token: string): Promise<AvailabilitySlot[]> => {

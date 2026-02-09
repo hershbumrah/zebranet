@@ -1,11 +1,12 @@
 """Message/chat routes."""
 
-from typing import List
+from typing import Dict, List, Set
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db_dep, get_current_user
+from app.core.security import decode_access_token
 from app.models.user import User
 from app.schemas.message import (
     MessageCreate,
@@ -19,6 +20,35 @@ from app.services.message_service import MessageService
 from app.services.ai_chat_service import AIChatAssistant
 
 router = APIRouter()
+
+
+class InboxConnectionManager:
+    def __init__(self) -> None:
+        self.active_connections: Dict[int, Set[WebSocket]] = {}
+
+    async def connect(self, user_id: int, websocket: WebSocket) -> None:
+        self.active_connections.setdefault(user_id, set()).add(websocket)
+
+    def disconnect(self, user_id: int, websocket: WebSocket) -> None:
+        if user_id in self.active_connections:
+            self.active_connections[user_id].discard(websocket)
+            if not self.active_connections[user_id]:
+                del self.active_connections[user_id]
+
+    async def notify_unread(self, user_id: int, unread_count: int) -> None:
+        if user_id not in self.active_connections:
+            return
+        dead: Set[WebSocket] = set()
+        for ws in self.active_connections[user_id]:
+            try:
+                await ws.send_json({"type": "unread", "unread_count": unread_count})
+            except Exception:
+                dead.add(ws)
+        for ws in dead:
+            self.disconnect(user_id, ws)
+
+
+inbox_manager = InboxConnectionManager()
 
 
 @router.post("/ai-chat", response_model=AIChatResponse)
@@ -39,6 +69,44 @@ async def ai_chat(
     return AIChatResponse(**result)
 
 
+@router.websocket("/ws/inbox")
+async def inbox_ws(
+    websocket: WebSocket,
+    token: str = Query(...),
+    db: Session = Depends(get_db_dep),
+) -> None:
+    await websocket.accept()
+
+    try:
+        payload = decode_access_token(token)
+    except ValueError:
+        await websocket.send_json({"type": "error", "message": "Invalid token"})
+        await websocket.close(code=1008)
+        return
+
+    user_id = payload.get("sub")
+    if not user_id:
+        await websocket.send_json({"type": "error", "message": "Invalid token"})
+        await websocket.close(code=1008)
+        return
+
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user:
+        await websocket.send_json({"type": "error", "message": "User not found"})
+        await websocket.close(code=1008)
+        return
+
+    await inbox_manager.connect(int(user_id), websocket)
+    try:
+        unread = await MessageService.get_unread_count(db, int(user_id))
+        await inbox_manager.notify_unread(int(user_id), unread)
+
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        inbox_manager.disconnect(int(user_id), websocket)
+
+
 @router.post("/", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 async def send_message(
     message_data: MessageCreate,
@@ -57,8 +125,11 @@ async def send_message(
     # Create message
     message = await MessageService.create_message(db, current_user.id, message_data)
     
-    # Return enriched message
-    return await MessageService._enrich_message(db, message)
+    # Return enriched message and notify recipient
+    response = await MessageService._enrich_message(db, message)
+    unread_count = await MessageService.get_unread_count(db, message_data.recipient_id)
+    await inbox_manager.notify_unread(message_data.recipient_id, unread_count)
+    return response
 
 
 @router.get("/conversations", response_model=List[ConversationParticipant])

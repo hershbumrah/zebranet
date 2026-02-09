@@ -254,6 +254,7 @@ export default function LeagueDashboard() {
         <div className="mt-6">
           <ChatBox />
         </div>
+
       </div>
     </MainLayout>
   );

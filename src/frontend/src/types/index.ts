@@ -140,6 +140,15 @@ export interface RefSearchParams {
   available_end?: string;
 }
 
+export interface RefereeLookup {
+  user_id: number;
+  referee_id: number;
+  full_name?: string;
+  email: string;
+  cert_level?: string;
+  home_location?: string;
+}
+
 // Message Types
 export interface Message {
   id: number;

@@ -3,13 +3,14 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.models.assignment import Assignment
 from app.models.note import RefNote
 from app.models.rating import Rating
 from app.models.referee import RefereeProfile
+from app.models.user import User
 
 
 def get_referee_stats(db: Session, ref_id: int) -> Dict[str, object]:
@@ -74,3 +75,20 @@ def search_candidate_refs(db: Session, constraints: Dict[str, object]) -> List[R
         if distance <= float(max_distance_km):
             filtered.append(ref)
     return filtered
+
+
+def search_refs_by_name_or_email(
+    db: Session, query: str, limit: int = 10
+) -> List[tuple[RefereeProfile, User]]:
+    if not query:
+        return []
+
+    like = f"%{query.strip()}%"
+    return (
+        db.query(RefereeProfile, User)
+        .join(User, User.id == RefereeProfile.user_id)
+        .filter(or_(RefereeProfile.full_name.ilike(like), User.email.ilike(like)))
+        .order_by(RefereeProfile.full_name.asc().nulls_last())
+        .limit(limit)
+        .all()
+    )

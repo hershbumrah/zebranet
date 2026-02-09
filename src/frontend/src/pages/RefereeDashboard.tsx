@@ -288,6 +288,7 @@ export default function RefereeDashboard() {
         <div className="mt-6">
           <ChatBox />
         </div>
+
       </div>
     </MainLayout>
   );

@@ -1,73 +1,81 @@
-# Welcome to your Lovable project
+# RefNexus
 
-## Project info
+RefNexus is a referee scheduling and league management platform. It helps leagues create games, find qualified referees, and coordinate assignments, while allowing referees to manage availability and respond to requests. It also includes an AI assistant and a direct messaging inbox between leagues and referees.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Intent
 
-## How can I edit this code?
+- Centralize game scheduling and referee assignment
+- Provide fast referee discovery and communication
+- Reduce back-and-forth via AI-assisted workflows
+- Improve operational visibility for leagues and refs
 
-There are several ways of editing your application.
+## Core Features
 
-**Use Lovable**
+- League and referee dashboards
+- Game creation and management
+- Referee search and AI matching
+- Direct messaging inbox (league ↔ referee)
+- AI assistant (RefNexus Agent) for scheduling and support
+- Role-based authentication and permissions
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend
 
-**Use your preferred IDE**
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- FastAPI (Python)
+- SQLAlchemy
+- PostgreSQL
+- JWT authentication
 
-Follow these steps:
+## Project Structure
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- [src/frontend](src/frontend) — React application
+- [src/backend](src/backend) — FastAPI application
+- [infra](infra) — infra and migrations
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Local Development
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Backend
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+cd src/backend
+uv run uvicorn app.main:app --reload
+```
+
+### Frontend
+
+```bash
+cd src/frontend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Backend uses the following in [src/backend/.env](src/backend/.env):
 
-**Use GitHub Codespaces**
+```
+DATABASE_URL=postgresql+psycopg2://<user>@localhost:5432/refnexus
+JWT_SECRET_KEY=change-me
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+OPENAI_API_KEY=
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Frontend uses `VITE_API_URL` (optional) to point to the backend.
 
-## What technologies are used for this project?
+## Database
 
-This project is built with:
+Manual migrations are stored in [infra/migrations/manual](infra/migrations/manual). Apply them with `psql` against your local database.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Notes
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- The inbox supports direct messaging and referee lookup by name/email.
+- The AI assistant is integrated for league/referee workflows.

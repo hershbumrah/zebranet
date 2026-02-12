@@ -25,7 +25,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Mock data storage
 let mockUsers: User[] = [
-  { id: 1, email: 'ref@demo.com', role: 'ref', created_at: '2024-01-01T00:00:00Z' },
+  { id: 1, email: 'ref@demo.com', role: 'referee', created_at: '2024-01-01T00:00:00Z' },
   { id: 2, email: 'league@demo.com', role: 'league', created_at: '2024-01-01T00:00:00Z' },
 ];
 

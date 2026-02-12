@@ -25,7 +25,7 @@ export default function Navbar() {
     navigate('/');
   };
 
-  const dashboardLink = user?.role === 'ref' ? '/referee' : '/league';
+  const dashboardLink = user?.role === 'referee' ? '/referee' : '/league';
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -106,7 +106,7 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem className="text-muted-foreground">
-                    Role: {user?.role === 'ref' ? 'Referee' : 'League'}
+                    Role: {user?.role === 'referee' ? 'Referee' : 'League'}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive">
@@ -145,7 +145,7 @@ export default function Navbar() {
                     <p className="text-sm text-muted-foreground">Signed in as</p>
                     <p className="font-medium truncate">{user?.email}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {user?.role === 'ref' ? 'Referee' : 'League'}
+                      {user?.role === 'referee' ? 'Referee' : 'League'}
                     </p>
                   </div>
                   <Link

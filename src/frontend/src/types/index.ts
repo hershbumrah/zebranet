@@ -1,5 +1,5 @@
 // User and Auth Types
-export type UserRole = 'ref' | 'league';
+export type UserRole = 'referee' | 'league';
 
 export interface User {
   id: number;
@@ -169,7 +169,7 @@ export interface ConversationParticipant {
   user_id: number;
   email: string;
   name?: string;
-  role: 'ref' | 'league';
+  role: 'referee' | 'league';
   last_message?: string;
   last_message_at?: string;
   unread_count: number;

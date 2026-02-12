@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { League, Game, RefereeWithStats } from '@/types';
-import { mockLeaguesApi, mockGamesApi, mockRefsApi, mockAiApi } from '@/services/mockApi';
+import { leaguesApi, gamesApi, refsApi, aiApi } from '@/services/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Users, Sparkles, Search } from 'lucide-react';
@@ -26,8 +26,8 @@ export default function LeagueDashboard() {
 
       try {
         const [leagueData, gamesData] = await Promise.all([
-          mockLeaguesApi.getProfile(token),
-          mockGamesApi.list(token),
+          leaguesApi.getProfile(token),
+          gamesApi.list(token),
         ]);
 
         setLeague(leagueData);
@@ -50,7 +50,7 @@ export default function LeagueDashboard() {
     if (!token) return;
 
     try {
-      const newGame = await mockGamesApi.create(token, data);
+      const newGame = await gamesApi.create(token, data);
       setGames([...games, newGame]);
       toast({
         title: 'Game created',
@@ -69,9 +69,9 @@ export default function LeagueDashboard() {
     if (!token) return;
 
     try {
-      await mockGamesApi.requestRef(token, gameId, refereeId, role);
+      await gamesApi.requestRef(token, gameId, refereeId, role);
       // Refresh games list
-      const updatedGames = await mockGamesApi.list(token);
+      const updatedGames = await gamesApi.list(token);
       setGames(updatedGames);
       toast({
         title: 'Request sent',
@@ -88,12 +88,12 @@ export default function LeagueDashboard() {
 
   const handleSearchRefs = async (params: any): Promise<RefereeWithStats[]> => {
     if (!token) return [];
-    return mockRefsApi.search(params);
+    return refsApi.search(params, token);
   };
 
   const handleAISearch = async (query: string, gameId?: number) => {
     if (!token) return null;
-    return mockAiApi.findRef(token, { natural_language_query: query, game_id: gameId });
+    return aiApi.findRef(token, { natural_language_query: query, game_id: gameId });
   };
 
   if (isLoading) {

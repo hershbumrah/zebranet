@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ConversationParticipant, Message, RefereeLookup } from '@/types';
-import { messagesApi, refsApi } from '@/services/api';
+import { API_BASE_URL, messagesApi, refsApi } from '@/services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -164,21 +165,40 @@ export default function Inbox({ className }: InboxProps) {
                 <div className="rounded-md border">
                   <ScrollArea className="h-48">
                     <div className="divide-y">
-                      {searchResults.map((ref) => (
+                      {searchResults.map((ref) => {
+                        const imageUrl = ref.profile_image_url
+                          ? ref.profile_image_url.startsWith('http')
+                            ? ref.profile_image_url
+                            : `${API_BASE_URL}${ref.profile_image_url}`
+                          : '';
+                        return (
                         <button
                           key={ref.user_id}
                           className="w-full text-left px-3 py-2 hover:bg-muted"
                           onClick={() => handleSelectSearchResult(ref)}
                         >
-                          <div className="font-medium">
-                            {ref.full_name || ref.email}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {ref.email}
-                            {ref.cert_level ? ` • ${ref.cert_level}` : ''}
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-9 w-9">
+                              {imageUrl ? (
+                                <AvatarImage src={imageUrl} alt={ref.full_name || ref.email} />
+                              ) : null}
+                              <AvatarFallback>
+                                {(ref.full_name || ref.email || "R").slice(0, 1).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-semibold">
+                                {ref.full_name || ref.email}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {ref.email}
+                                {ref.cert_level ? ` • ${ref.cert_level}` : ''}
+                              </div>
+                            </div>
                           </div>
                         </button>
-                      ))}
+                      );
+                      })}
                     </div>
                   </ScrollArea>
                 </div>

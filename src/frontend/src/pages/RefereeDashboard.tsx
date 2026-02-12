@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { RefereeProfile, RefereeStats, Assignment, AvailabilitySlot } from '@/types';
-import { mockRefsApi } from '@/services/mockApi';
+import { refsApi } from '@/services/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Star, Calendar, Clipboard, Trophy } from 'lucide-react';
@@ -27,9 +27,9 @@ export default function RefereeDashboard() {
 
       try {
         const [profileData, assignmentsData, availabilityData] = await Promise.all([
-          mockRefsApi.getProfile(token),
-          mockRefsApi.getAssignments(token),
-          mockRefsApi.getAvailability(token),
+          refsApi.getProfile(token),
+          refsApi.getAssignments(token),
+          refsApi.getAvailability(token),
         ]);
 
         setProfile(profileData);
@@ -37,7 +37,7 @@ export default function RefereeDashboard() {
         setAvailability(availabilityData);
 
         if (profileData) {
-          const statsData = await mockRefsApi.getStats(profileData.id);
+          const statsData = await refsApi.getStats(profileData.id, token);
           setStats(statsData);
         }
       } catch (error) {
@@ -58,7 +58,7 @@ export default function RefereeDashboard() {
     if (!token) return;
 
     try {
-      const updated = await mockRefsApi.updateProfile(token, data);
+      const updated = await refsApi.updateProfile(token, data);
       setProfile(updated);
       toast({
         title: 'Profile updated',
@@ -77,7 +77,7 @@ export default function RefereeDashboard() {
     if (!token) return;
 
     try {
-      const newSlot = await mockRefsApi.addAvailability(token, startTime, endTime);
+      const newSlot = await refsApi.addAvailability(token, startTime, endTime);
       setAvailability([...availability, newSlot]);
       toast({
         title: 'Availability added',
@@ -96,7 +96,7 @@ export default function RefereeDashboard() {
     if (!token) return;
 
     try {
-      await mockRefsApi.deleteAvailability(token, slotId);
+      await refsApi.deleteAvailability(token, slotId);
       setAvailability(availability.filter((a) => a.id !== slotId));
       toast({
         title: 'Availability removed',
@@ -115,7 +115,7 @@ export default function RefereeDashboard() {
     if (!token) return;
 
     try {
-      const updated = await mockRefsApi.respondToAssignment(token, assignmentId, response);
+      const updated = await refsApi.respondToAssignment(token, assignmentId, response);
       setAssignments(assignments.map((a) => (a.id === assignmentId ? { ...a, ...updated } : a)));
       toast({
         title: response === 'accepted' ? 'Assignment accepted' : 'Assignment declined',

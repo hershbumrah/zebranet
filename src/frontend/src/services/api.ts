@@ -24,7 +24,7 @@ import {
 } from '@/types';
 
 // Configure your FastAPI backend URL here
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 class ApiClient {
   private baseUrl: string;
@@ -83,6 +83,25 @@ class ApiClient {
 
     me: async (token: string): Promise<User> => {
       return this.request<User>('/auth/me', {}, token);
+    },
+
+    uploadProfileImage: async (token: string, file: File): Promise<User> => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch(`${this.baseUrl}/auth/profile-image`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
     },
   };
 

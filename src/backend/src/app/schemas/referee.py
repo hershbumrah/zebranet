@@ -40,6 +40,7 @@ class RefereeLookupResponse(BaseModel):
     email: str
     cert_level: Optional[str] = None
     home_location: Optional[str] = None
+    profile_image_url: Optional[str] = None
 
 
 class NoteSummary(BaseModel):

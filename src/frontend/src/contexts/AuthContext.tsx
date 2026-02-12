@@ -8,7 +8,13 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, role: UserRole, extraData?: Record<string, string>) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    role: UserRole,
+    extraData?: Record<string, string>,
+    profileImageFile?: File | null
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -43,11 +49,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(response.access_token);
   };
 
-  const register = async (email: string, password: string, role: UserRole, extraData?: Record<string, string>) => {
+  const register = async (
+    email: string,
+    password: string,
+    role: UserRole,
+    extraData?: Record<string, string>,
+    profileImageFile?: File | null
+  ) => {
     const response = await authApi.register(email, password, role, extraData);
     localStorage.setItem('token', response.access_token);
-    setUser(response.user);
     setToken(response.access_token);
+
+    if (profileImageFile) {
+      const updatedUser = await authApi.uploadProfileImage(response.access_token, profileImageFile);
+      setUser(updatedUser);
+    } else {
+      setUser(response.user);
+    }
   };
 
   const logout = () => {

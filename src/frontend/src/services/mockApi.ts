@@ -206,7 +206,7 @@ export const mockAuthApi = {
     };
     mockUsers.push(newUser);
 
-    if (role === 'ref') {
+    if (role === 'referee') {
       mockReferees.push({
         id: mockReferees.length + 1,
         user_id: newUser.id,

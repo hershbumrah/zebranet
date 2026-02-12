@@ -5,6 +5,7 @@ export interface User {
   id: number;
   email: string;
   role: UserRole;
+  profile_image_url?: string | null;
   created_at: string;
 }
 
@@ -147,6 +148,7 @@ export interface RefereeLookup {
   email: string;
   cert_level?: string;
   home_location?: string;
+  profile_image_url?: string | null;
 }
 
 // Message Types

@@ -8,6 +8,7 @@ from pydantic import BaseModel, EmailStr
 class UserBase(BaseModel):
     email: EmailStr
     role: str
+    profile_image_url: Optional[str] = None
 
 
 class UserResponse(UserBase):
@@ -23,6 +24,10 @@ class RegisterRequest(BaseModel):
     role: str
     name: Optional[str] = None
     region: Optional[str] = None
+    primary_region: Optional[str] = None
+    home_location: Optional[str] = None
+    cert_level: Optional[str] = None
+    profile_image_url: Optional[str] = None
 
 
 class LoginRequest(BaseModel):
@@ -33,3 +38,7 @@ class LoginRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class AuthResponse(Token):
+    user: UserResponse

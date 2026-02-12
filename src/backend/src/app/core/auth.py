@@ -18,8 +18,19 @@ def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     return user
 
 
-def create_user(db: Session, email: str, password: str, role: str) -> User:
-    user = User(email=email, hashed_password=get_password_hash(password), role=role)
+def create_user(
+    db: Session,
+    email: str,
+    password: str,
+    role: str,
+    profile_image_url: Optional[str] = None,
+) -> User:
+    user = User(
+        email=email,
+        hashed_password=get_password_hash(password),
+        role=role,
+        profile_image_url=profile_image_url,
+    )
     db.add(user)
     db.commit()
     db.refresh(user)

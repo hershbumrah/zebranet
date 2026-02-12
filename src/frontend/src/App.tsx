@@ -34,7 +34,7 @@ const App = () => (
             <Route
               path="/referee"
               element={
-                <ProtectedRoute allowedRoles={['ref']}>
+                <ProtectedRoute allowedRoles={['referee']}>
                   <RefereeDashboard />
                 </ProtectedRoute>
               }
@@ -50,7 +50,7 @@ const App = () => (
             <Route
               path="/inbox"
               element={
-                <ProtectedRoute allowedRoles={['ref', 'league']}>
+                <ProtectedRoute allowedRoles={['referee', 'league']}>
                   <InboxPage />
                 </ProtectedRoute>
               }

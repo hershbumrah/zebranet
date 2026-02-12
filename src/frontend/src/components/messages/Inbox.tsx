@@ -19,7 +19,7 @@ type ChatUser = {
   user_id: number;
   email: string;
   name?: string;
-  role: 'ref' | 'league';
+  role: 'referee' | 'league';
 };
 
 export default function Inbox({ className }: InboxProps) {
@@ -125,7 +125,7 @@ export default function Inbox({ className }: InboxProps) {
       user_id: ref.user_id,
       email: ref.email,
       name: ref.full_name,
-      role: 'ref',
+      role: 'referee',
     };
     setSelectedUser(chatUser);
     setMessages([]);

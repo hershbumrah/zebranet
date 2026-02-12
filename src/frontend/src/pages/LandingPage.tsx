@@ -17,7 +17,7 @@ import {
 export default function LandingPage() {
   const { isAuthenticated, user } = useAuth();
 
-  const dashboardLink = user?.role === 'ref' ? '/referee' : '/league';
+  const dashboardLink = user?.role === 'referee' ? '/referee' : '/league';
 
   return (
     <MainLayout>

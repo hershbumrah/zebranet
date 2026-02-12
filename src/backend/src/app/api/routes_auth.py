@@ -20,20 +20,21 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db_dep)) -> Use
     if existing:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
     
-    # Validate role (frontend sends "ref" / "league", allow legacy "referee")
+    # Validate role (frontend sends "ref" / "league", normalize to DB values)
     if payload.role not in {"ref", "referee", "league"}:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid role. Must be 'ref' or 'league'"
         )
 
-    normalized_role = "ref" if payload.role == "referee" else payload.role
+    # Normalize to database role values ('referee' or 'league')
+    normalized_role = "referee" if payload.role in {"ref", "referee"} else "league"
     
     # Create user account
     user = create_user(db, payload.email, payload.password, normalized_role)
     
     # Create associated profile
-    if normalized_role == "ref":
+    if normalized_role == "referee":
         profile = RefereeProfile(user_id=user.id, full_name=payload.name)
         db.add(profile)
     elif normalized_role == "league":

@@ -46,6 +46,7 @@ RefNexus is a referee scheduling and league management platform. It helps league
 
 ```bash
 cd src/backend
+export PYTHONPATH=src
 uv run uvicorn app.main:app --reload
 ```
 

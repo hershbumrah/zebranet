@@ -1,6 +1,6 @@
--- 0001_initial_schema.sql
+-- 0001_initial_schema_clean.sql
 -- Production-ready initial database schema for RefNexus
--- Supports multi-user roles (referees & league managers), availability tracking, game assignments, and performance metrics
+-- Idempotent version: uses IF NOT EXISTS on all creates
 
 -- ============================================================================
 -- AUTHENTICATION & USER MANAGEMENT
@@ -16,9 +16,8 @@ CREATE TABLE IF NOT EXISTS users (
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE INDEX IF NOT EXISTS IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS IF NOT EXISTS idx_users_created_at ON users(created_at);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 
 -- ============================================================================
 -- REFEREE PROFILES & EXPERIENCE METRICS
@@ -30,11 +29,11 @@ CREATE TABLE IF NOT EXISTS referee_profiles (
     full_name VARCHAR(255),
     
     -- Experience & Credentials
-    cert_level VARCHAR(100),  -- e.g., 'U8', 'U12', 'Adult', 'Advanced'
-    years_experience INTEGER,  -- Total years reffing
+    cert_level VARCHAR(100),
+    years_experience INTEGER,
     
     -- Position specialization
-    primary_positions VARCHAR(255),  -- e.g., 'Center, AR (Assistant Ref)'
+    primary_positions VARCHAR(255),
     
     -- Location & Travel
     home_location VARCHAR(255),
@@ -52,24 +51,6 @@ CREATE TABLE IF NOT EXISTS referee_profiles (
 
 CREATE INDEX IF NOT EXISTS idx_referee_profiles_user_id ON referee_profiles(user_id);
 CREATE INDEX IF NOT EXISTS idx_referee_profiles_location ON referee_profiles(home_location);
-CREATE INDEX IF NOT EXISTS idx_referee_profiles_total_games ON referee_profiles(total_games_reffed);
-
--- Track referee experience by age group & competition level
-CREATE TABLE IF NOT EXISTS referee_experience_by_category (
-    id SERIAL PRIMARY KEY,
-    referee_id INTEGER NOT NULL REFERENCES referee_profiles(id) ON DELETE CASCADE,
-    age_group VARCHAR(100) NOT NULL,  -- e.g., 'U10', 'U19', 'Adult'
-    gender_focus VARCHAR(50),  -- e.g., 'Boys', 'Girls', 'Mixed'
-    games_reffed INTEGER NOT NULL DEFAULT 0,
-    last_game_date TIMESTAMP WITH TIME ZONE,
-    competency_level VARCHAR(50) DEFAULT 'beginner' CHECK (competency_level IN ('beginner', 'intermediate', 'expert')),
-    
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(referee_id, age_group, gender_focus)
-);
-
-CREATE INDEX IF NOT EXISTS idx_referee_experience_category ON referee_experience_by_category(referee_id, age_group);
 
 -- ============================================================================
 -- AVAILABILITY TRACKING
@@ -82,7 +63,7 @@ CREATE TABLE IF NOT EXISTS availability_slots (
     end_time TIMESTAMP WITH TIME ZONE NOT NULL,
     
     is_recurring BOOLEAN NOT NULL DEFAULT FALSE,
-    recurrence_pattern VARCHAR(50),  -- e.g., 'weekly', 'biweekly'
+    recurrence_pattern VARCHAR(50),
     
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -103,9 +84,7 @@ CREATE TABLE IF NOT EXISTS leagues (
     user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255),
     primary_region VARCHAR(255),
-    
-    -- League level / tier
-    level VARCHAR(100),  -- e.g., 'recreational', 'competitive', 'elite'
+    level VARCHAR(100),
     
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -122,7 +101,7 @@ CREATE INDEX IF NOT EXISTS idx_leagues_level ON leagues(level);
 CREATE TABLE IF NOT EXISTS field_locations (
     id SERIAL PRIMARY KEY,
     league_id INTEGER NOT NULL REFERENCES leagues(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,  -- e.g., 'Central Park Field A', 'Downtown Complex'
+    name VARCHAR(255) NOT NULL,
     address VARCHAR(500),
     latitude FLOAT NOT NULL,
     longitude FLOAT NOT NULL,
@@ -143,22 +122,17 @@ CREATE TABLE IF NOT EXISTS games (
     league_id INTEGER NOT NULL REFERENCES leagues(id) ON DELETE CASCADE,
     field_location_id INTEGER NOT NULL REFERENCES field_locations(id) ON DELETE RESTRICT,
     
-    -- Game scheduling
     scheduled_start TIMESTAMP WITH TIME ZONE NOT NULL,
     
-    -- Game details
-    age_group VARCHAR(100),  -- e.g., 'U10', 'U19'
-    gender_focus VARCHAR(50),  -- e.g., 'Boys', 'Girls', 'Mixed'
-    competition_level VARCHAR(100),  -- e.g., 'group stage', 'finals'
+    age_group VARCHAR(100),
+    gender_focus VARCHAR(50),
+    competition_level VARCHAR(100),
     
-    -- Game status
     status VARCHAR(50) NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'pending', 'assigned', 'completed', 'cancelled')),
     
-    -- Fee structure
     center_fee FLOAT,
     ar_fee FLOAT,
     
-    -- Internal tracking
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -175,15 +149,12 @@ CREATE TABLE IF NOT EXISTS assignments (
     game_id INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
     referee_id INTEGER NOT NULL REFERENCES referee_profiles(id) ON DELETE CASCADE,
     
-    -- Role in the game
-    role VARCHAR(50) NOT NULL,  -- e.g., 'center', 'ar1', 'ar2'
+    role VARCHAR(50) NOT NULL,
     
-    -- Assignment lifecycle
     status VARCHAR(50) NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'accepted', 'rejected', 'confirmed', 'completed', 'no_show')),
     assigned_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     responded_at TIMESTAMP WITH TIME ZONE,
     
-    -- Audit trail
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
@@ -202,14 +173,11 @@ CREATE INDEX IF NOT EXISTS idx_assignments_assigned_at ON assignments(assigned_a
 CREATE TABLE IF NOT EXISTS game_ref_requirements (
     id SERIAL PRIMARY KEY,
     game_id INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
-    role VARCHAR(50) NOT NULL,  -- e.g., 'center', 'ar1', 'ar2'
+    role VARCHAR(50) NOT NULL,
     
-    -- Minimum experience required
     min_years_experience INTEGER,
     min_cert_level VARCHAR(100),
-    
-    -- Preferred specializations
-    required_age_group_experience VARCHAR(100),  -- e.g., 'must have U10 experience'
+    required_age_group_experience VARCHAR(100),
     
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
@@ -222,18 +190,15 @@ CREATE INDEX IF NOT EXISTS idx_game_ref_requirements_game_id ON game_ref_require
 -- PERFORMANCE & FEEDBACK
 -- ============================================================================
 
--- League ratings of referees
 CREATE TABLE IF NOT EXISTS ratings (
     id SERIAL PRIMARY KEY,
     league_id INTEGER NOT NULL REFERENCES leagues(id) ON DELETE CASCADE,
     referee_id INTEGER NOT NULL REFERENCES referee_profiles(id) ON DELETE CASCADE,
     game_id INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
     
-    -- Rating details
     score INTEGER NOT NULL CHECK (score >= 1 AND score <= 5),
     comment VARCHAR(1000),
     
-    -- Audit trail
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -242,20 +207,17 @@ CREATE INDEX IF NOT EXISTS idx_ratings_referee_id ON ratings(referee_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_league_id ON ratings(league_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_game_id ON ratings(game_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_score ON ratings(score);
-CREATE INDEX IF NOT EXISTS idx_ratings_created_at ON ratings(created_at);
 
--- Notes/feedback about referees from leagues (can be private)
+-- Notes/feedback about referees from leagues
 CREATE TABLE IF NOT EXISTS ref_notes (
     id SERIAL PRIMARY KEY,
     league_id INTEGER NOT NULL REFERENCES leagues(id) ON DELETE CASCADE,
     referee_id INTEGER NOT NULL REFERENCES referee_profiles(id) ON DELETE CASCADE,
     game_id INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
     
-    -- Note content & privacy
     note_text VARCHAR(2000) NOT NULL,
     visibility VARCHAR(50) NOT NULL DEFAULT 'private_to_league' CHECK (visibility IN ('private_to_league', 'visible_to_ref', 'visible_to_all_leagues')),
     
-    -- Audit trail
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -263,36 +225,3 @@ CREATE TABLE IF NOT EXISTS ref_notes (
 CREATE INDEX IF NOT EXISTS idx_ref_notes_referee_id ON ref_notes(referee_id);
 CREATE INDEX IF NOT EXISTS idx_ref_notes_league_id ON ref_notes(league_id);
 CREATE INDEX IF NOT EXISTS idx_ref_notes_visibility ON ref_notes(visibility);
-
--- ============================================================================
--- AUDIT & SYSTEM LOGGING
--- ============================================================================
-
--- Optional: Track assignment history for audit purposes
-CREATE TABLE IF NOT EXISTS assignment_audit_log (
-    id SERIAL PRIMARY KEY,
-    assignment_id INTEGER NOT NULL REFERENCES assignments(id) ON DELETE CASCADE,
-    old_status VARCHAR(50),
-    new_status VARCHAR(50) NOT NULL,
-    changed_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    changed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reason VARCHAR(500)
-);
-
-CREATE INDEX IF NOT EXISTS idx_assignment_audit_log_assignment_id ON assignment_audit_log(assignment_id);
-CREATE INDEX IF NOT EXISTS idx_assignment_audit_log_changed_at ON assignment_audit_log(changed_at);
-
--- ============================================================================
--- SYSTEM INTEGRITY CHECKS (enforced at application layer)
--- ============================================================================
-
--- Note: Role verification is enforced at the application layer, not in DB.
--- PostgreSQL doesn't support subqueries in CHECK constraints.
-
--- ============================================================================
--- GRANT permissions (adjust user as needed for your environment)
--- ============================================================================
-
--- Uncomment if running in managed environment with specific DB user:
--- GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_user;
--- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_user;

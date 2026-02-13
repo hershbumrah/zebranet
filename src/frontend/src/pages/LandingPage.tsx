@@ -30,7 +30,7 @@ export default function LandingPage() {
               <span className="text-primary">Soccer Referee</span> Management
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              RefNexus connects leagues with qualified referees using smart matching and AI-powered assignments. 
+              Refium connects leagues with qualified referees using smart matching and AI-powered assignments. 
               Simplify scheduling, track performance, and build better games.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -70,7 +70,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Whether you're a referee looking for games or a league managing assignments, 
-              RefNexus has the tools you need.
+              Refium has the tools you need.
             </p>
           </div>
 
@@ -236,7 +236,7 @@ export default function LandingPage() {
             Ready to Get Started?
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Join RefNexus today and experience the modern way to manage soccer officiating. 
+            Join Refium today and experience the modern way to manage soccer officiating. 
             It's free to get started.
           </p>
           {isAuthenticated ? (
@@ -263,10 +263,10 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              <span className="font-semibold text-foreground">RefNexus</span>
+              <span className="font-semibold text-foreground">Refium</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} RefNexus. Soccer referee management made simple.
+              © {new Date().getFullYear()} Refium. Soccer referee management made simple.
             </p>
           </div>
         </div>

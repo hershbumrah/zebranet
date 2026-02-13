@@ -10,7 +10,7 @@ from app.api import routes_ai, routes_auth, routes_games, routes_leagues, routes
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="RefNexus API")
+    app = FastAPI(title="Refium API")
 
     uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
     uploads_dir.mkdir(parents=True, exist_ok=True)

@@ -95,7 +95,7 @@ export default function RegisterPage() {
       await register(email, password, role, extraData, profileImageFile);
       toast({
         title: 'Account created!',
-        description: 'Welcome to RefNexus.',
+        description: 'Welcome to Refium.',
       });
       navigate('/');
     } catch (error) {
@@ -115,7 +115,7 @@ export default function RegisterPage() {
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-2">
             <Shield className="h-10 w-10 text-primary" />
-            <span className="text-2xl font-bold text-foreground">RefNexus</span>
+            <span className="text-2xl font-bold text-foreground">Refium</span>
           </Link>
         </div>
 

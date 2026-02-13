@@ -44,7 +44,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-2">
             <Shield className="h-10 w-10 text-primary" />
-            <span className="text-2xl font-bold text-foreground">RefNexus</span>
+            <span className="text-2xl font-bold text-foreground">Refium</span>
           </Link>
         </div>
 

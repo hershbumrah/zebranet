@@ -1,6 +1,6 @@
-# RefNexus
+# Refium
 
-RefNexus is a referee scheduling and league management platform. It helps leagues create games, find qualified referees, and coordinate assignments, while allowing referees to manage availability and respond to requests. It also includes an AI assistant and a direct messaging inbox between leagues and referees.
+Refium is a referee scheduling and league management platform. It helps leagues create games, find qualified referees, and coordinate assignments, while allowing referees to manage availability and respond to requests. It also includes an AI assistant and a direct messaging inbox between leagues and referees.
 
 ## Intent
 
@@ -15,7 +15,7 @@ RefNexus is a referee scheduling and league management platform. It helps league
 - Game creation and management
 - Referee search and AI matching
 - Direct messaging inbox (league ↔ referee)
-- AI assistant (RefNexus Agent) for scheduling and support
+- AI assistant (Refium Agent) for scheduling and support
 - Role-based authentication and permissions
 
 ## Tech Stack

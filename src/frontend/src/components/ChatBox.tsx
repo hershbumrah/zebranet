@@ -44,8 +44,8 @@ export default function ChatBox({ className }: ChatBoxProps) {
   useEffect(() => {
     if (messages.length === 0) {
       const greeting = user?.role === 'league'
-        ? "Hi! I'm RefNexus Agent. I can help you find referees, schedule games, and manage your league. What would you like to do today?"
-        : "Hi! I'm RefNexus Agent. I can help you find games, manage your availability, and view assignments. How can I assist you?";
+        ? "Hi! I'm Refium Agent. I can help you find referees, schedule games, and manage your league. What would you like to do today?"
+        : "Hi! I'm Refium Agent. I can help you find games, manage your availability, and view assignments. How can I assist you?";
       
       setMessages([{
         role: 'assistant',
@@ -115,8 +115,8 @@ export default function ChatBox({ className }: ChatBoxProps) {
 
   const clearChat = () => {
     const greeting = user?.role === 'league'
-      ? "Hi! I'm RefNexus Agent. I can help you find referees, schedule games, and manage your league. What would you like to do today?"
-      : "Hi! I'm RefNexus Agent. I can help you find games, manage your availability, and view assignments. How can I assist you?";
+      ? "Hi! I'm Refium Agent. I can help you find referees, schedule games, and manage your league. What would you like to do today?"
+      : "Hi! I'm Refium Agent. I can help you find games, manage your availability, and view assignments. How can I assist you?";
     
     setMessages([{
       role: 'assistant',
@@ -142,7 +142,7 @@ export default function ChatBox({ className }: ChatBoxProps) {
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             <div>
-              <CardTitle>RefNexus Agent</CardTitle>
+              <CardTitle>Refium Agent</CardTitle>
               <CardDescription>Ask me anything about scheduling and assignments</CardDescription>
             </div>
           </div>
@@ -183,7 +183,7 @@ export default function ChatBox({ className }: ChatBoxProps) {
                     {!isUser && (
                       <div className="flex items-center gap-2 mb-1">
                         <Sparkles className="h-3 w-3 text-primary" />
-                        <span className="text-xs font-medium text-primary">RefNexus Agent</span>
+                        <span className="text-xs font-medium text-primary">Refium Agent</span>
                       </div>
                     )}
                     <p className="text-sm whitespace-pre-wrap break-words">

@@ -29,7 +29,7 @@ class AIChatAssistant:
     @staticmethod
     def get_system_prompt(user_role: str, user_context: Dict[str, Any]) -> str:
         """Generate system prompt based on user role and context."""
-        base_prompt = """You are RefNexus AI Assistant, a helpful assistant for referee scheduling and game and league management.
+        base_prompt = """You are Refium AI Assistant, a helpful assistant for referee scheduling and game and league management.
 
 You help users with:
 - Finding and suggesting referees for games

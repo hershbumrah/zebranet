@@ -1,1 +1,1 @@
-"""RefNexus backend application package."""
+"""Refium backend application package."""
